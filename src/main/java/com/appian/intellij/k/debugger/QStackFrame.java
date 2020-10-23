@@ -40,4 +40,35 @@ public class QStackFrame extends XStackFrame {
     }
     return null;
   }
+
+
+  /**
+   * Hooks into IntelliJ debugger API to display variables for a stackframe
+   * Displays the SAIL bindings at the given stack frame
+   */
+  @Override
+  public void computeChildren(@NotNull XCompositeNode node) {
+//    List<SailBinding> bindings = descriptor.getBindings();
+    if (jsonData != null && !jsonData.isJsonNull()) {
+      XValueChildrenList childrenList = getChildrenListFromBindings(jsonData);
+      node.addChildren(childrenList, true);
+    } else {
+      super.computeChildren(node);
+    }
+  }
+
+  public XValueChildrenList getChildrenListFromBindings(JsonObject bindings) {
+    XValueChildrenList childrenList = new XValueChildrenList();
+    for (String key : bindings.keySet()) {
+      childrenList.add(new XNamedValue(key) {
+        @Override
+        public void computePresentation(
+            @NotNull XValueNode node, @NotNull XValuePlace place) {
+          JsonObject variableJson = (JsonObject)new JsonParser().parse(bindings.get(key).toString());
+          node.setPresentation(null, variableJson.get("type").toString(), variableJson.get("data").toString(), false);
+        }
+      });
+    }
+    return childrenList;
+  }
 }
