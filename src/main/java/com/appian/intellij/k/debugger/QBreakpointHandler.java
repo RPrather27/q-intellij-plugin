@@ -28,6 +28,13 @@ public class QBreakpointHandler extends XBreakpointHandler {
     }
   }
 
+  /**
+   * We could change the debugger to send a request to Q to load a new instrumented file. (non-trivial) Process would be:
+   * 1) Call sparq to instrument the new file
+   * 2) Connect to all running Q sessions, and reload the newly instrumented file.
+   *     - Have some config for the Debug process which would help identify the q processes to be instrumented.
+   * 3) Reload the original file on breakpoint removal
+   */
   @Override
   public void registerBreakpoint(@NotNull XBreakpoint breakpoint) {
     String fileName = ((XLineBreakpointImpl) breakpoint).getFile().getName();
