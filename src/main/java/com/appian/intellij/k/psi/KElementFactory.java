@@ -4,6 +4,7 @@ import com.appian.intellij.k.KFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
+import com.intellij.util.LocalTimeCounter;
 
 public final class KElementFactory {
   public static KUserId createKUserId(Project project, String name) {
@@ -26,5 +27,11 @@ public final class KElementFactory {
     String name = "dummy.k";
     return (KFile)PsiFileFactory.getInstance(project).
         createFileFromText(name, KFileType.INSTANCE, text);
+  }
+
+  public static KFile createFile(Project project, String text, boolean systemEventEnabled) {
+    String name = "dummy.k";
+    return (KFile)PsiFileFactory.getInstance(project).
+        createFileFromText(name, KFileType.INSTANCE, text, LocalTimeCounter.currentTime(), true);
   }
 }

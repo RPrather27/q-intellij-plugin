@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.appian.intellij.k.KFileType;
+import com.appian.intellij.k.psi.KElementFactory;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -19,7 +20,7 @@ public class QDebuggerEditorsProvider extends XDebuggerEditorsProviderBase {
 
   @Override
   protected PsiFile createExpressionCodeFragment(@NotNull Project project, @NotNull String text, @Nullable PsiElement context, boolean isPhysical) {
-    return null;
+    return KElementFactory.createFile(project, text, true);
   }
 
   @NotNull
