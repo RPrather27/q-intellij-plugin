@@ -19,7 +19,13 @@ public class QBreakpointHandler extends XBreakpointHandler {
     this.breakpointService = breakpointService;
 
     File brkpointDir = new File("/tmp/breakpoint");
-    brkpointDir.mkdir();
+    if (!brkpointDir.exists()) {
+      brkpointDir.mkdir();
+    } else {
+      for (File oldBrkFile : brkpointDir.listFiles()) {
+          oldBrkFile.delete();
+      }
+    }
   }
 
   @Override
