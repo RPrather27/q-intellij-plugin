@@ -2,6 +2,7 @@ package com.appian.intellij.k.debugger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +60,7 @@ public class QBreakpointHandler extends XBreakpointHandler {
   }
 
   public void unregisterAllBreakpoints() {
-    for (XLineBreakpoint breakpoint : breakpointService.getXLineBreakpoints()) {
+    for (XLineBreakpoint breakpoint : new ArrayList<XLineBreakpoint>(breakpointService.getXLineBreakpoints())) {
       unregisterBreakpoint(breakpoint, false);
     }
   }

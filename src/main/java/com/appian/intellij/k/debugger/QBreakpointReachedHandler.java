@@ -16,16 +16,18 @@ public class QBreakpointReachedHandler {
   }
 
   public void process(String fileName, int lineNumber) {
-    final XLineBreakpoint[] breakpointReached = new XLineBreakpoint[1];
-    final QSuspendContext[] qSuspendContext = new QSuspendContext[1];
+    XLineBreakpoint breakpointReached = null;
+    QSuspendContext qSuspendContext = null;
     for (XLineBreakpoint breakpoint : breakpointService.getXLineBreakpoints()) {
       XLineBreakpointImpl breakpointImpl = (XLineBreakpointImpl) breakpoint;
       if (fileName.equals(breakpointImpl.getFile().getName()) && breakpoint.getLine() == lineNumber) {
-        qSuspendContext[0] = new QSuspendContext(breakpointImpl.getFile(), lineNumber);
-        breakpointReached[0] = breakpoint;
+        qSuspendContext = new QSuspendContext(breakpointImpl.getFile(), lineNumber);
+        breakpointReached = breakpoint;
       }
     }
-    debugSession.breakpointReached(breakpointReached[0], null, qSuspendContext[0]);
-    debugSession.positionReached(qSuspendContext[0]);
+    if (breakpointReached != null & qSuspendContext != null) {
+      debugSession.breakpointReached(breakpointReached, null, qSuspendContext);
+      debugSession.positionReached(qSuspendContext);
+    }
   }
 }
