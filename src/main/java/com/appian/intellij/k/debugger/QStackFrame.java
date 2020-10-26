@@ -3,6 +3,7 @@ package com.appian.intellij.k.debugger;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,10 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Scanner;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredTextContainer;
@@ -22,15 +26,31 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
+import com.intellij.xdebugger.frame.XCompositeNode;
+import com.intellij.xdebugger.frame.XNamedValue;
 import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.frame.XValueChildrenList;
+import com.intellij.xdebugger.frame.XValueNode;
+import com.intellij.xdebugger.frame.XValuePlace;
 
 public class QStackFrame extends XStackFrame {
   private final int lineNumber;
   private final VirtualFile virtualFile;
+  private final JsonObject jsonData;
 
   public QStackFrame(VirtualFile virtualFile, int lineNumber) {
     this.virtualFile = virtualFile;
     this.lineNumber = lineNumber;
+    File f = new File("/tmp/breakpoint/" + virtualFile.getName() + "_" + (lineNumber+1) + ".brqn");
+    String data = "";
+    try (Scanner myReader = new Scanner(f)) {
+      while (myReader.hasNextLine()) {
+        data += myReader.nextLine();
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    jsonData = (JsonObject)new JsonParser().parse(data);
   }
 
   @Override
@@ -60,13 +80,13 @@ public class QStackFrame extends XStackFrame {
    */
   @Override
   public void computeChildren(@NotNull XCompositeNode node) {
-//    List<SailBinding> bindings = descriptor.getBindings();
     if (jsonData != null && !jsonData.isJsonNull()) {
       XValueChildrenList childrenList = getChildrenListFromBindings(jsonData);
       node.addChildren(childrenList, true);
     } else {
       super.computeChildren(node);
     }
+  }
 
  public XValueChildrenList getChildrenListFromBindings(JsonObject bindings) {
     XValueChildrenList childrenList = new XValueChildrenList();
